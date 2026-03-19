@@ -34,7 +34,7 @@ $FLUTTER_BIN pub get
 echo "========================================="
 echo "Building web (this may take 5-10 minutes)..."
 echo "========================================="
-$FLUTTER_BIN build web --release --web-renderer canvaskit
+$FLUTTER_BIN build web --release
 
 echo "========================================="
 echo "Build completed!"
