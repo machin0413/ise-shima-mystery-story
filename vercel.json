@@ -1,7 +1,5 @@
 {
   "buildCommand": "chmod +x build.sh && ./build.sh",
   "outputDirectory": "build/web",
-  "installCommand": "echo 'No install needed'",
-  "framework": null,
-  "functions": {}
+  "installCommand": "echo 'No install needed'"
 }
