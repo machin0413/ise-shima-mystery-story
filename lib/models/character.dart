@@ -87,6 +87,26 @@ class GameCharacters {
     description: '地元の駐在さん。温厚だが捜査には不慣れ。',
     imagePath: 'assets/images/policeman.jpg',
   );
+
+  // Day2から登場
+  static final Character detective = Character(
+    id: 'detective',
+    name: '橘刑事',
+    age: 42,
+    role: '県警捜査一課',
+    description: '本庁から派遣された敏腕刑事。よそ者に冷たい。',
+    imagePath: 'assets/images/policeman.jpg', // 暫定
+  );
+
+  static final Character pearlBoss = Character(
+    id: 'pearl_boss',
+    name: '西山社長',
+    age: 58,
+    role: '真珠養殖場社長',
+    description: '村の有力者。開発計画を推進。',
+    secret: '不法投棄と殺人を隠蔽',
+    imagePath: 'assets/images/takeshi.jpg', // 暫定
+  );
   
   static final List<Character> all = [
     akiko,
@@ -96,6 +116,8 @@ class GameCharacters {
     takeshi,
     okami,
     policeman,
+    detective,
+    pearlBoss,
   ];
   
   static Character? getById(String id) {
