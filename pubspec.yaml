@@ -37,9 +37,6 @@ dependencies:
   
   # Local storage for save data
   shared_preferences: 2.5.3
-  
-  # js interop (Flutter Web用 - HTML5 Audio API使用)
-  js: ^0.6.7
 
 dev_dependencies:
   flutter_test:
