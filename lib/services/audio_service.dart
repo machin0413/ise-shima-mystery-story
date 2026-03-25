@@ -1,118 +1,199 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+// ignore: depend_on_referenced_packages, avoid_web_libraries_in_flutter
+import 'package:js/js.dart' if (dart.library.io) '../stub/js_stub.dart';
 
+// JS interop for FlutterAudioPlayer (Web only)
+// ignore: non_constant_identifier_names
+@JS('FlutterAudioPlayer.playBgm')
+external void _jsBgmPlay(String src, bool loop);
+
+@JS('FlutterAudioPlayer.stopBgm')
+external void _jsBgmStop();
+
+@JS('FlutterAudioPlayer.pauseBgm')
+external void _jsBgmPause();
+
+@JS('FlutterAudioPlayer.resumeBgm')
+external void _jsBgmResume();
+
+@JS('FlutterAudioPlayer.setBgmEnabled')
+external void _jsBgmSetEnabled(bool enabled);
+
+@JS('FlutterAudioPlayer.setBgmVolume')
+external void _jsBgmSetVolume(double volume);
+
+@JS('FlutterAudioPlayer.playSfx')
+external void _jsSfxPlay(String src);
+
+@JS('FlutterAudioPlayer.setSfxEnabled')
+external void _jsSfxSetEnabled(bool enabled);
+
+@JS('FlutterAudioPlayer.setSfxVolume')
+external void _jsSfxSetVolume(double volume);
+
+@JS('FlutterAudioPlayer.isBgmPlaying')
+external bool _jsBgmIsPlaying();
+
+/// AudioService - Web版はJS interop経由でHTML5 Audioを使用
 class AudioService {
   static final AudioService _instance = AudioService._internal();
   factory AudioService() => _instance;
   AudioService._internal();
 
-  final AudioPlayer _bgmPlayer = AudioPlayer();
-  final AudioPlayer _sfxPlayer = AudioPlayer();
-  
   bool _isBgmEnabled = true;
   bool _isSfxEnabled = true;
   String? _currentBgm;
-
-  // BGM volume (0.0 to 1.0)
   double _bgmVolume = 0.6;
   double _sfxVolume = 0.8;
 
   bool get isBgmEnabled => _isBgmEnabled;
   bool get isSfxEnabled => _isSfxEnabled;
+  String? get currentBgm => _currentBgm;
+  double get bgmVolume => _bgmVolume;
 
   Future<void> initialize() async {
-    try {
-      await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-      await _sfxPlayer.setReleaseMode(ReleaseMode.stop);
-      await _bgmPlayer.setVolume(_bgmVolume);
-      await _sfxPlayer.setVolume(_sfxVolume);
-      if (kDebugMode) {
-        debugPrint('✅ AudioService initialized');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('⚠️ AudioService initialization error: $e');
-      }
+    if (kDebugMode) {
+      debugPrint('✅ AudioService initialized (Web/JS mode)');
     }
   }
 
   Future<void> playBgm(String assetPath) async {
     if (!_isBgmEnabled) return;
-    
-    // 同じBGMが再生中なら何もしない
-    if (_currentBgm == assetPath && _bgmPlayer.state == PlayerState.playing) {
-      return;
-    }
+    _currentBgm = assetPath;
 
-    try {
-      await _bgmPlayer.stop();
-      _currentBgm = assetPath;
-      await _bgmPlayer.play(AssetSource(assetPath));
-      if (kDebugMode) {
-        debugPrint('🎵 BGM started: $assetPath');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ BGM play error: $e');
+    if (kIsWeb) {
+      try {
+        final src = 'assets/$assetPath';
+        _jsBgmPlay(src, true);
+        if (kDebugMode) {
+          debugPrint('🎵 BGM started (web): $src');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ BGM play error: $e');
+        }
       }
     }
   }
 
   Future<void> stopBgm() async {
-    await _bgmPlayer.stop();
     _currentBgm = null;
-    if (kDebugMode) {
-      debugPrint('🎵 BGM stopped');
+    if (kIsWeb) {
+      try {
+        _jsBgmStop();
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ BGM stop error: $e');
+        }
+      }
     }
   }
 
   Future<void> pauseBgm() async {
-    await _bgmPlayer.pause();
+    if (kIsWeb) {
+      try {
+        _jsBgmPause();
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ BGM pause error: $e');
+        }
+      }
+    }
   }
 
   Future<void> resumeBgm() async {
-    if (_isBgmEnabled && _currentBgm != null) {
-      await _bgmPlayer.resume();
+    if (_isBgmEnabled && _currentBgm != null && kIsWeb) {
+      try {
+        _jsBgmResume();
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ BGM resume error: $e');
+        }
+      }
     }
   }
 
   Future<void> playSfx(String assetPath) async {
     if (!_isSfxEnabled) return;
-    
-    try {
-      await _sfxPlayer.play(AssetSource(assetPath));
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ SFX play error: $e');
+    if (kIsWeb) {
+      try {
+        final src = 'assets/$assetPath';
+        _jsSfxPlay(src);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ SFX play error: $e');
+        }
       }
     }
   }
 
   void setBgmEnabled(bool enabled) {
     _isBgmEnabled = enabled;
-    if (!enabled) {
-      stopBgm();
-    } else if (_currentBgm != null) {
+    if (kIsWeb) {
+      try {
+        _jsBgmSetEnabled(enabled);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ setBgmEnabled error: $e');
+        }
+      }
+    }
+    if (enabled && _currentBgm != null) {
       playBgm(_currentBgm!);
     }
   }
 
   void setSfxEnabled(bool enabled) {
     _isSfxEnabled = enabled;
+    if (kIsWeb) {
+      try {
+        _jsSfxSetEnabled(enabled);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ setSfxEnabled error: $e');
+        }
+      }
+    }
   }
 
   void setBgmVolume(double volume) {
     _bgmVolume = volume.clamp(0.0, 1.0);
-    _bgmPlayer.setVolume(_bgmVolume);
+    if (kIsWeb) {
+      try {
+        _jsBgmSetVolume(_bgmVolume);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ setBgmVolume error: $e');
+        }
+      }
+    }
   }
 
   void setSfxVolume(double volume) {
     _sfxVolume = volume.clamp(0.0, 1.0);
-    _sfxPlayer.setVolume(_sfxVolume);
+    if (kIsWeb) {
+      try {
+        _jsSfxSetVolume(_sfxVolume);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ setSfxVolume error: $e');
+        }
+      }
+    }
+  }
+
+  bool get isBgmPlaying {
+    if (kIsWeb) {
+      try {
+        return _jsBgmIsPlaying();
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
   }
 
   void dispose() {
-    _bgmPlayer.dispose();
-    _sfxPlayer.dispose();
+    stopBgm();
   }
 }

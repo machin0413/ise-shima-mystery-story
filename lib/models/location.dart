@@ -4,6 +4,7 @@ class Location {
   final String name;
   final String description;
   final List<String> availableCharacters; // この場所にいるキャラクター
+  final List<String> day2Characters; // Day2に追加されるキャラクター
   final String? backgroundImage; // 背景画像パス
   
   Location({
@@ -11,8 +12,16 @@ class Location {
     required this.name,
     required this.description,
     this.availableCharacters = const [],
+    this.day2Characters = const [],
     this.backgroundImage,
   });
+
+  List<String> getCharacters(int day) {
+    if (day >= 2) {
+      return [...availableCharacters, ...day2Characters];
+    }
+    return availableCharacters;
+  }
 }
 
 /// ゲーム内のロケーション一覧
@@ -54,6 +63,7 @@ class Locations {
     name: '駐在所',
     description: '村の小さな駐在所。村田巡査が一人で守っている。',
     availableCharacters: ['policeman'],
+    day2Characters: ['detective'],
     backgroundImage: 'assets/images/bg_police_station.jpg',
   );
   
@@ -64,6 +74,15 @@ class Locations {
     availableCharacters: [],
     backgroundImage: 'assets/images/bg_beach.jpg',
   );
+
+  static final Location pearlFarm = Location(
+    id: 'pearl_farm',
+    name: '真珠養殖場',
+    description: '村の沖合にある養殖場。立入制限がある。',
+    availableCharacters: [],
+    day2Characters: ['pearl_boss'],
+    backgroundImage: 'assets/images/bg_harbor.jpg', // 暫定
+  );
   
   static final List<Location> all = [
     minshuku,
@@ -72,6 +91,7 @@ class Locations {
     harbor,
     policeStation,
     beach,
+    pearlFarm,
   ];
   
   static Location? getById(String id) {

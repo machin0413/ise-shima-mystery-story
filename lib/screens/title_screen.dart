@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'game_screen.dart';
 import '../services/audio_service.dart';
+import '../services/save_service.dart';
+import 'settings_screen.dart';
 
 class TitleScreen extends StatefulWidget {
   const TitleScreen({super.key});
@@ -14,6 +16,9 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
   late Animation<double> _fadeAnimation;
   final AudioService _audioService = AudioService();
   bool _isBgmPlaying = false;
+  bool _hasSaveData = false;
+  String? _saveSummary;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -24,8 +29,21 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _controller.forward();
+    _checkSaveData();
   }
-  
+
+  Future<void> _checkSaveData() async {
+    final hasSave = await SaveService.hasSaveData();
+    final summary = hasSave ? await SaveService.getSaveSummary() : null;
+    if (mounted) {
+      setState(() {
+        _hasSaveData = hasSave;
+        _saveSummary = summary;
+        _isLoading = false;
+      });
+    }
+  }
+
   void _toggleBgm() {
     setState(() {
       if (_isBgmPlaying) {
@@ -100,7 +118,7 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                           Text(
                             '泡沫に消えた海女',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontSize: 32,
+                              fontSize: 30,
                               letterSpacing: 4,
                               fontWeight: FontWeight.bold,
                               shadows: [
@@ -112,11 +130,11 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           Text(
                             '- 伊勢志摩殺人事件 -',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontSize: 20,
+                              fontSize: 18,
                               letterSpacing: 3,
                               color: const Color(0xFF00AAAA),
                               shadows: [
@@ -128,11 +146,11 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           Text(
                             'ISE-SHIMA MURDER CASE',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontSize: 12,
+                              fontSize: 11,
                               letterSpacing: 2,
                             ),
                             textAlign: TextAlign.center,
@@ -141,46 +159,26 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                       ),
                     ),
                     
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 40),
                     
-                    // サブタイトル
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF001100).withValues(alpha: 0.7),
-                        border: Border.all(
-                          color: const Color(0xFF00FF00).withValues(alpha: 0.5),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        'レトロ推理アドベンチャー',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
+                    // バージョン表示
                     Text(
-                      'パイロット版 ver 0.1',
+                      'ver 1.0.0',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        color: const Color(0xFF00AA00),
+                        fontSize: 12,
+                        color: const Color(0xFF006600),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 40),
                 
                     // メニューボタン
                     SizedBox(
-                      width: 250,
+                      width: 260,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          // はじめから
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF001100),
@@ -189,7 +187,6 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
                             onPressed: () {
-                              // BGMを停止してからゲーム画面へ遷移
                               _audioService.stopBgm();
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
@@ -199,24 +196,69 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                             },
                             child: const Text('はじめから', style: TextStyle(fontSize: 18)),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
+                          // つづきから
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF001100),
-                              foregroundColor: const Color(0xFF004400),
-                              side: const BorderSide(color: Color(0xFF004400), width: 2),
+                              backgroundColor: _hasSaveData
+                                  ? const Color(0xFF001100)
+                                  : const Color(0xFF000800),
+                              foregroundColor: _hasSaveData
+                                  ? const Color(0xFF00AAAA)
+                                  : const Color(0xFF003333),
+                              side: BorderSide(
+                                color: _hasSaveData
+                                    ? const Color(0xFF00AAAA)
+                                    : const Color(0xFF003333),
+                                width: 2,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            onPressed: null, // パイロット版では無効
-                            child: const Text('つづきから（未実装）', style: TextStyle(fontSize: 16)),
+                            onPressed: _isLoading
+                                ? null
+                                : _hasSaveData
+                                    ? () async {
+                                        _audioService.stopBgm();
+                                        final savedState = await SaveService.loadGame();
+                                        if (mounted) {
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder: (context) => GameScreen(
+                                                savedState: savedState,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    : null,
+                            child: Column(
+                              children: [
+                                const Text('つづきから', style: TextStyle(fontSize: 18)),
+                                if (_hasSaveData && _saveSummary != null)
+                                  Text(
+                                    _saveSummary!,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Color(0xFF008888),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                if (!_hasSaveData && !_isLoading)
+                                  const Text(
+                                    'セーブデータなし',
+                                    style: TextStyle(fontSize: 11),
+                                  ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
+                          // ゲームについて
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF001100),
                               foregroundColor: const Color(0xFF00AA00),
                               side: const BorderSide(color: Color(0xFF00AA00), width: 2),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: () {
                               _showAboutDialog(context);
@@ -227,43 +269,64 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
                       ),
                     ),
                     
-                    const SizedBox(height: 30),
-                    
-                    // BGM ON/OFFボタン
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _isBgmPlaying ? const Color(0xFF00FF00) : const Color(0xFF006600),
-                        side: BorderSide(
-                          color: _isBgmPlaying ? const Color(0xFF00FF00) : const Color(0xFF006600),
-                          width: 1,
+                    const SizedBox(height: 20),
+
+                    // BGM & 設定ボタン行
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _isBgmPlaying
+                                ? const Color(0xFF00FF00)
+                                : const Color(0xFF006600),
+                            side: BorderSide(
+                              color: _isBgmPlaying
+                                  ? const Color(0xFF00FF00)
+                                  : const Color(0xFF006600),
+                              width: 1,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          ),
+                          onPressed: _toggleBgm,
+                          icon: Icon(
+                            _isBgmPlaying ? Icons.volume_up : Icons.volume_off,
+                            size: 18,
+                          ),
+                          label: Text(
+                            _isBgmPlaying ? 'BGM ON' : 'BGM OFF',
+                            style: const TextStyle(fontSize: 13),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      ),
-                      onPressed: _toggleBgm,
-                      icon: Icon(
-                        _isBgmPlaying ? Icons.volume_up : Icons.volume_off,
-                        size: 20,
-                      ),
-                      label: Text(
-                        _isBgmPlaying ? 'BGM ON' : 'BGM OFF',
-                        style: const TextStyle(fontSize: 14),
-                      ),
+                        const SizedBox(width: 12),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF006600),
+                            side: const BorderSide(color: Color(0xFF006600), width: 1),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => SettingsScreen(
+                                onReset: () => _checkSaveData(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.settings, size: 18),
+                          label: const Text('設定', style: TextStyle(fontSize: 13)),
+                        ),
+                      ],
                     ),
                     
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     
                     // コピーライト
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF000000).withValues(alpha: 0.6),
-                      ),
-                      child: Text(
-                        '© 2025 Retro Mystery Games',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 12,
-                          color: const Color(0xFF006600),
-                        ),
+                    Text(
+                      '© 2025 Retro Mystery Games',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 11,
+                        color: const Color(0xFF004400),
                       ),
                     ),
                   ],
@@ -305,13 +368,22 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
 コマンドを選んで情報を集め、
 事件の真相に迫りましょう。
 
-【パイロット版について】
-このバージョンはDay 1の序盤のみ
-プレイ可能な体験版です。
-
 【操作方法】
-画面下部のコマンドボタンを
-タップして操作します。
+・はなす：その場所の人物と会話
+・しらべる：場所や物を調べる
+・かんがえる：手がかりを整理
+・いどうする：別の場所へ移動
+・こっそりしらべる：警戒度増加のリスクあり
+・推理する：犯人を特定して真相解明
+
+【注意】
+警戒度が100%になると
+ゲームオーバーになります。
+
+【ストーリー進行】
+5回行動すると時間が経過します。
+Day 1〜Day 2にわたる物語を
+お楽しみください。
 ''',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 14,
