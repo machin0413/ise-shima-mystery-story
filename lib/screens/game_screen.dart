@@ -226,7 +226,8 @@ Day ${gameState.currentDay} ${gameState.currentTime}
           onClose: () {
             Navigator.of(context).pop();
             setState(() {
-              currentText = conv['text'];
+              // ダイアログを閉じた後は、会話内容を背景に表示しない
+              currentText = '${character.name}と話をした。';
               gameState.talkedTo.add(charId);
               
               if (conv['clue'] != null) {
