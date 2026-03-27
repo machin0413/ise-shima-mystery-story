@@ -21,74 +21,44 @@ class AudioService {
 
   Future<void> initialize() async {
     if (kDebugMode) {
-      debugPrint('✅ AudioService initialized');
+      debugPrint('✅ AudioService initialized (Web mode)');
     }
   }
 
   Future<void> playBgm(String assetPath) async {
     if (!_isBgmEnabled) return;
     _currentBgm = assetPath;
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.playBgm', ['assets/$assetPath', true]);
-        if (kDebugMode) debugPrint('🎵 BGM: assets/$assetPath');
-      } catch (e) {
-        if (kDebugMode) debugPrint('BGM error: $e');
-      }
-    }
+    // Web以外では何もしない
+    if (!kIsWeb) return;
+    // assets/ プレフィックスを付けてJSに渡す
+    jsCallImpl('FlutterAudioPlayer.playBgm', ['assets/$assetPath', true]);
   }
 
   Future<void> stopBgm() async {
     _currentBgm = null;
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.stopBgm', []);
-      } catch (e) {
-        if (kDebugMode) debugPrint('BGM stop error: $e');
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.stopBgm', []);
   }
 
   Future<void> pauseBgm() async {
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.pauseBgm', []);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.pauseBgm', []);
   }
 
   Future<void> resumeBgm() async {
-    if (_isBgmEnabled && _currentBgm != null && kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.resumeBgm', []);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!_isBgmEnabled || _currentBgm == null || !kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.resumeBgm', []);
   }
 
   Future<void> playSfx(String assetPath) async {
-    if (!_isSfxEnabled) return;
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.playSfx', ['assets/$assetPath']);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!_isSfxEnabled || !kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.playSfx', ['assets/$assetPath']);
   }
 
   void setBgmEnabled(bool enabled) {
     _isBgmEnabled = enabled;
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.setBgmEnabled', [enabled]);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.setBgmEnabled', [enabled]);
     if (enabled && _currentBgm != null) {
       playBgm(_currentBgm!);
     }
@@ -96,47 +66,26 @@ class AudioService {
 
   void setSfxEnabled(bool enabled) {
     _isSfxEnabled = enabled;
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.setSfxEnabled', [enabled]);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.setSfxEnabled', [enabled]);
   }
 
   void setBgmVolume(double volume) {
     _bgmVolume = volume.clamp(0.0, 1.0);
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.setBgmVolume', [_bgmVolume]);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.setBgmVolume', [_bgmVolume]);
   }
 
   void setSfxVolume(double volume) {
     _sfxVolume = volume.clamp(0.0, 1.0);
-    if (kIsWeb) {
-      try {
-        jsCallImpl('FlutterAudioPlayer.setSfxVolume', [_sfxVolume]);
-      } catch (e) {
-        // ignore
-      }
-    }
+    if (!kIsWeb) return;
+    jsCallImpl('FlutterAudioPlayer.setSfxVolume', [_sfxVolume]);
   }
 
   bool get isBgmPlaying {
-    if (kIsWeb) {
-      try {
-        final result = jsCallImpl('FlutterAudioPlayer.isBgmPlaying', []);
-        return result == true;
-      } catch (e) {
-        return false;
-      }
-    }
-    return false;
+    if (!kIsWeb) return false;
+    final result = jsCallImpl('FlutterAudioPlayer.isBgmPlaying', []);
+    return result == true;
   }
 
   void dispose() {

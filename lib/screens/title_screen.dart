@@ -44,16 +44,15 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
     }
   }
 
-  void _toggleBgm() {
-    setState(() {
-      if (_isBgmPlaying) {
-        _audioService.stopBgm();
-        _isBgmPlaying = false;
-      } else {
-        _audioService.playBgm('audio/title_theme.mp3');
-        _isBgmPlaying = true;
-      }
-    });
+  Future<void> _toggleBgm() async {
+    if (_isBgmPlaying) {
+      await _audioService.stopBgm();
+      setState(() => _isBgmPlaying = false);
+    } else {
+      // playBgm を先に呼んでから setState（ユーザーインタラクション内で呼ぶことが重要）
+      await _audioService.playBgm('audio/title_theme.mp3');
+      setState(() => _isBgmPlaying = true);
+    }
   }
 
   @override

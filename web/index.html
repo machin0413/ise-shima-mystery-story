@@ -18,24 +18,25 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="レトロ推理アドベンチャーゲーム - 伊勢志摩を舞台にした推理ゲーム">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="flutter_app">
+  <meta name="apple-mobile-web-app-title" content="泡沫に消えた海女">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>泡沫に消えた海女 - 伊勢志摩殺人事件</title>
-  <meta name="description" content="レトロ推理アドベンチャーゲーム - 伊勢志摩を舞台にした推理ゲーム">
   <link rel="manifest" href="manifest.json">
-  <!-- Web Audio Player (HTML5 Audio API for BGM/SFX) -->
+
+  <!-- Web Audio Player: FlutterAudioPlayerを同期的に読み込む（Flutterより先に定義必須） -->
   <script src="audio_player.js"></script>
 </head>
 <body>
+  <!-- Flutter bootstrap (async: Flutterの初期化後にDartからJSを呼ぶ) -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
