@@ -11,69 +11,75 @@
     _isBgmEnabled: true,
     _isSfxEnabled: true,
     _currentBgmSrc: null,
+    _pendingPlay: false,
 
     // BGMを再生
     playBgm: function(src, loop) {
-      console.log('[FAP] playBgm called:', src, 'loop:', loop);
-      
-      if (!this._isBgmEnabled) {
-        console.log('[FAP] BGM disabled, skipping');
-        return;
-      }
+      console.log('[FAP] playBgm called:', src);
+
+      if (!this._isBgmEnabled) return;
       if (loop === undefined) loop = true;
 
       // 同じBGMが再生中なら何もしない
       if (this._bgmAudio && !this._bgmAudio.paused && this._currentBgmSrc === src) {
-        console.log('[FAP] Same BGM already playing, skipping');
+        console.log('[FAP] Already playing same BGM');
         return;
       }
 
       // 既存のBGMを停止
       if (this._bgmAudio) {
         this._bgmAudio.pause();
-        this._bgmAudio.currentTime = 0;
+        this._bgmAudio.src = '';
         this._bgmAudio = null;
       }
 
       try {
         this._currentBgmSrc = src;
-        this._bgmAudio = new Audio(src);
-        this._bgmAudio.loop = loop;
-        this._bgmAudio.volume = this._bgmVolume;
-        
-        console.log('[FAP] Audio object created, attempting play...');
-        
+        var audio = new Audio();
+        audio.loop = loop;
+        audio.volume = this._bgmVolume;
+        audio.preload = 'auto';
+        audio.src = src;
+        this._bgmAudio = audio;
+
         var self = this;
-        var playPromise = this._bgmAudio.play();
+
+        // ロード後に再生試行
+        audio.addEventListener('canplaythrough', function() {
+          console.log('[FAP] Audio loaded, attempting play');
+        }, { once: true });
+
+        audio.addEventListener('error', function(e) {
+          console.error('[FAP] Audio load error:', e.target.error, 'src:', src);
+        });
+
+        var playPromise = audio.play();
         if (playPromise !== undefined) {
           playPromise.then(function() {
-            console.log('[FAP] BGM playing successfully:', src);
+            console.log('[FAP] ✅ BGM playing:', src);
+            self._pendingPlay = false;
           }).catch(function(error) {
-            console.warn('[FAP] BGM autoplay blocked:', error.message);
-            // ユーザーインタラクション後に再試行するためのフラグ
+            console.warn('[FAP] Autoplay blocked:', error.message);
             self._pendingPlay = true;
-            
-            // クリック/タップイベントで再生を再試行
+
+            // ユーザーインタラクション後に再試行
             var retry = function() {
-              if (self._pendingPlay && self._bgmAudio) {
+              if (self._bgmAudio && self._pendingPlay) {
                 self._bgmAudio.play().then(function() {
-                  console.log('[FAP] BGM started after user interaction');
+                  console.log('[FAP] ✅ BGM started after user interaction');
                   self._pendingPlay = false;
                 }).catch(function(e) {
                   console.error('[FAP] Retry failed:', e);
                 });
               }
-              document.removeEventListener('click', retry);
-              document.removeEventListener('touchstart', retry);
-              document.removeEventListener('keydown', retry);
             };
             document.addEventListener('click', retry, { once: true });
             document.addEventListener('touchstart', retry, { once: true });
-            document.addEventListener('keydown', retry, { once: true });
+            document.addEventListener('pointerdown', retry, { once: true });
           });
         }
       } catch (e) {
-        console.error('[FAP] Error creating audio:', e);
+        console.error('[FAP] Error in playBgm:', e);
       }
     },
 
@@ -82,7 +88,7 @@
       console.log('[FAP] stopBgm called');
       if (this._bgmAudio) {
         this._bgmAudio.pause();
-        this._bgmAudio.currentTime = 0;
+        this._bgmAudio.src = '';
         this._bgmAudio = null;
         this._currentBgmSrc = null;
         this._pendingPlay = false;
@@ -105,7 +111,7 @@
       }
     },
 
-    // BGMの有効/無効切り替え
+    // BGMの有効/無効
     setBgmEnabled: function(enabled) {
       console.log('[FAP] setBgmEnabled:', enabled);
       this._isBgmEnabled = enabled;
@@ -116,7 +122,7 @@
       }
     },
 
-    // BGMのボリューム設定
+    // BGMボリューム
     setBgmVolume: function(volume) {
       this._bgmVolume = Math.max(0, Math.min(1, volume));
       if (this._bgmAudio) {
@@ -151,5 +157,5 @@
     }
   };
 
-  console.log('[FAP] FlutterAudioPlayer initialized and ready');
+  console.log('[FAP] FlutterAudioPlayer initialized');
 })();

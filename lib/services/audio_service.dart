@@ -30,8 +30,8 @@ class AudioService {
     _currentBgm = assetPath;
     // Web以外では何もしない
     if (!kIsWeb) return;
-    // assets/ プレフィックスを付けてJSに渡す
-    jsCallImpl('FlutterAudioPlayer.playBgm', ['assets/$assetPath', true]);
+    // Flutter Webのアセットは assets/assets/ の下に配置される
+    jsCallImpl('FlutterAudioPlayer.playBgm', ['assets/assets/$assetPath', true]);
   }
 
   Future<void> stopBgm() async {
@@ -52,7 +52,7 @@ class AudioService {
 
   Future<void> playSfx(String assetPath) async {
     if (!_isSfxEnabled || !kIsWeb) return;
-    jsCallImpl('FlutterAudioPlayer.playSfx', ['assets/$assetPath']);
+    jsCallImpl('FlutterAudioPlayer.playSfx', ['assets/assets/$assetPath']);
   }
 
   void setBgmEnabled(bool enabled) {
