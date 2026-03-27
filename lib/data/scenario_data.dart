@@ -19,8 +19,8 @@ class ScenarioData {
 私は民宿の布団に潜り込んだ。
 ''';
 
-  /// Day 1 朝のテキスト
-  static const String day1Morning = '''
+  /// Day 1 朝（民宿）のテキスト
+  static const String day1MorningMinshuku = '''
 ――翌朝――
 
 女将さんに起こされた。
@@ -29,9 +29,17 @@ class ScenarioData {
 アキコさんが来てないんです！」
 
 約束の時間を30分も過ぎている。
-海女小屋に向かうと、
+こんなことは初めてだという。
+
+急いで海女小屋に向かった方が良さそうだ。
+''';
+
+  /// Day 1 朝（海女小屋到着後）のテキスト
+  static const String day1MorningAmagoya = '''
+海女小屋に到着した。
+
 何人かの海女さんたちが
-心配そうに話し込んでいた。
+心配そうに話し込んでいる。
 
 「昨日の夜は確かに家にいたのに...」
 「こんなことは初めてだよ」

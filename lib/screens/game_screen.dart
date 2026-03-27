@@ -86,16 +86,23 @@ Day ${gameState.currentDay} ${gameState.currentTime}
 
   void _continueToDay1() {
     setState(() {
-      currentText = ScenarioData.day1Morning;
+      currentText = ScenarioData.day1MorningMinshuku;
       gameState.currentDay = 1;
       gameState.currentTime = '朝';
-      gameState.currentLocation = '海女小屋';
-      gameState.currentLocationId = 'amagoya';
-      gameState.setFlag('heard_about_missing', true);
+      gameState.currentLocation = '民宿';
+      gameState.currentLocationId = 'minshuku';
+      gameState.setFlag('heard_about_missing', false); // まだ詳細を聞いていない
+      gameState.setFlag('must_go_to_amagoya', true); // 海女小屋に行く必要がある
       isOpening = false;
     });
     _playGameBgm();
-    _autoSave();
+    
+    // 少し遅延してから女将さんの強制イベントを表示
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _showOkamiForceEvent();
+      }
+    });
   }
 
   void _playGameBgm() {
@@ -385,6 +392,51 @@ Day ${gameState.currentDay} ${gameState.currentTime}
   }
 
   void _showMoveDialog() {
+    // 海女小屋に行く必要がある場合の制限
+    if (gameState.getFlag('must_go_to_amagoya')) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF001100),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+            side: const BorderSide(color: Color(0xFF00FF00), width: 2),
+          ),
+          title: Text(
+            'どこへ行く?',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
+          ),
+          content: const Text(
+            '急いで海女小屋に向かった方が良さそうだ。\n\nアキコさんが来ていないとのことだし...',
+            style: TextStyle(fontSize: 15),
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _moveToLocation(Locations.getById('amagoya')!);
+                  // 海女小屋に到着したらフラグを解除
+                  setState(() {
+                    gameState.setFlag('must_go_to_amagoya', false);
+                    gameState.setFlag('heard_about_missing', true);
+                    currentText = ScenarioData.day1MorningAmagoya;
+                  });
+                },
+                child: const Text('海女小屋へ向かう'),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('やめる'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    
+    // 通常の移動ダイアログ
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -964,6 +1016,41 @@ Day ${gameState.currentDay} ${gameState.currentTime}
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  // 女将さんの強制イベント（ゲーム開始時）
+  void _showOkamiForceEvent() {
+    final character = char.GameCharacters.getById('okami');
+    if (character == null) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 閉じられないようにする
+      builder: (context) => CharacterDialogue(
+        character: character,
+        text: '''「お客さん！大変なんです！」
+
+女将さんが慌てた様子で駆け込んできた。
+
+「アキコさんが来てないんです！
+約束の時間を30分も過ぎてるのに...
+こんなこと、今まで一度もなかったのに！」
+
+どうやら、今朝インタビューの約束をしていた
+海女の鈴木アキコさんが
+約束の時間になっても現れないようだ。
+
+「海女小屋に行ってみてください！
+他の海女さんたちも心配してるんです！」''',
+        onClose: () {
+          Navigator.of(context).pop();
+          setState(() {
+            currentText = '急いで海女小屋に向かった方が良さそうだ。';
+          });
+          _autoSave();
+        },
       ),
     );
   }
