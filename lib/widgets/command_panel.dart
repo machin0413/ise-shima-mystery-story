@@ -71,7 +71,7 @@ class CommandPanel extends StatelessWidget {
             children: [
               Expanded(
                 child: _CommandButton(
-                  label: 'こっそり\nしらべる',
+                  label: 'こっそり調べる',
                   icon: Icons.visibility_off,
                   onPressed: () => onCommandSelected('secret'),
                   isWarning: true,
@@ -150,11 +150,13 @@ class _CommandButton extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 11,
               fontFamily: 'monospace',
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
