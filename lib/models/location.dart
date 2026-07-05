@@ -81,7 +81,7 @@ class Locations {
     description: '村の沖合にある養殖場。立入制限がある。',
     availableCharacters: [],
     day2Characters: ['pearl_boss'],
-    backgroundImage: 'assets/images/bg_harbor.jpg', // 暫定
+    backgroundImage: 'assets/images/bg_pearl_farm.jpg',
   );
   
   static final List<Location> all = [

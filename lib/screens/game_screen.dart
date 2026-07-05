@@ -73,12 +73,14 @@ Day ${gameState.currentDay} ${gameState.currentTime}
         'assets/images/takeshi.jpg',
         'assets/images/policeman.jpg',
         'assets/images/detective.jpg',
+        'assets/images/nishiyama.jpg',
         'assets/images/bg_minshuku.jpg',
         'assets/images/bg_amagoya.jpg',
         'assets/images/bg_beach.jpg',
         'assets/images/bg_suzuki_house.jpg',
         'assets/images/bg_harbor.jpg',
         'assets/images/bg_police_station.jpg',
+        'assets/images/bg_pearl_farm.jpg',
       ];
       for (final path in imagePaths) {
         precacheImage(AssetImage(path), context);

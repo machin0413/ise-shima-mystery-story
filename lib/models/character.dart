@@ -105,7 +105,7 @@ class GameCharacters {
     role: '真珠養殖場社長',
     description: '村の有力者。開発計画を推進。',
     secret: '不法投棄と殺人を隠蔽',
-    imagePath: 'assets/images/takeshi.jpg', // 暫定
+    imagePath: 'assets/images/nishiyama.jpg',
   );
   
   static final List<Character> all = [

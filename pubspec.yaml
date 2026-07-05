@@ -69,6 +69,7 @@ flutter:
     - assets/images/takeshi.jpg
     - assets/images/policeman.jpg
     - assets/images/detective.jpg
+    - assets/images/nishiyama.jpg
     # Background images (PC-98 style)
     - assets/images/bg_minshuku.jpg
     - assets/images/bg_amagoya.jpg
@@ -76,6 +77,7 @@ flutter:
     - assets/images/bg_suzuki_house.jpg
     - assets/images/bg_harbor.jpg
     - assets/images/bg_police_station.jpg
+    - assets/images/bg_pearl_farm.jpg
     # Title screen background
     - assets/images/title_bg.jpg
     # Audio files
