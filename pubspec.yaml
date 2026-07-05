@@ -85,7 +85,11 @@ flutter:
     - assets/images/backgrounds/harbor.jpg
     - assets/images/backgrounds/police_station.jpg
     # Audio files
-    - assets/audio/title_theme.mp3
+    - assets/audio/bgm_title_theme_8bit.mp3
+    - assets/audio/bgm_investigation_day_8bit.mp3
+    - assets/audio/bgm_evening_night_8bit.mp3
+    - assets/audio/bgm_tense_event_8bit.mp3
+    - assets/audio/bgm_true_ending_8bit.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

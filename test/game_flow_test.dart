@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_app/models/game_state.dart';
 import 'package:flutter_app/screens/game_screen.dart';
+import 'package:flutter_app/services/audio_service.dart';
 
 GameState solvableState({bool foundAkiko = false, bool withClues = true}) {
   final s = GameState();
@@ -101,5 +102,43 @@ void main() {
 
     expect(find.text('BAD ENDING'), findsOneWidget);
     expect(find.textContaining('3日目の朝が来てしまった'), findsOneWidget);
+  });
+
+  group('BGM切り替え', () {
+    testWidgets('朝〜昼は調査曲', (tester) async {
+      final state = solvableState();
+      state.currentTime = '朝';
+      await pumpGame(tester, state);
+      expect(AudioService().currentBgm, 'audio/bgm_investigation_day_8bit.mp3');
+    });
+
+    testWidgets('夕方〜夜は不穏曲', (tester) async {
+      await pumpGame(tester, solvableState()); // 夕
+      expect(AudioService().currentBgm, 'audio/bgm_evening_night_8bit.mp3');
+    });
+
+    testWidgets('アキコ発見後は緊迫曲', (tester) async {
+      await pumpGame(tester, solvableState(foundAkiko: true));
+      expect(AudioService().currentBgm, 'audio/bgm_tense_event_8bit.mp3');
+    });
+
+    testWidgets('警戒度70以上は緊迫曲', (tester) async {
+      final state = solvableState();
+      state.currentTime = '朝';
+      state.policeAlert = 70;
+      await pumpGame(tester, state);
+      expect(AudioService().currentBgm, 'audio/bgm_tense_event_8bit.mp3');
+    });
+
+    testWidgets('TRUE ENDINGで専用曲が流れる', (tester) async {
+      await pumpGame(tester, solvableState(foundAkiko: true));
+
+      await tester.tap(find.text('推理する'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('西山社長（真珠養殖場）'));
+      await tester.pumpAndSettle();
+
+      expect(AudioService().currentBgm, 'audio/bgm_true_ending_8bit.mp3');
+    });
   });
 }

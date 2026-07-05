@@ -106,9 +106,23 @@ Day ${gameState.currentDay} ${gameState.currentTime}
     });
   }
 
+  /// 現在のゲーム状態に応じたBGMファイルを返す
+  String bgmForCurrentState() {
+    // 緊迫状況：アキコ発見後、または警戒度が高い
+    if (gameState.getFlag('found_akiko') || gameState.policeAlert >= 70) {
+      return 'audio/bgm_tense_event_8bit.mp3';
+    }
+    // 夕方〜夜は不穏な曲
+    if (gameState.currentTime == '夕' || gameState.currentTime == '夜') {
+      return 'audio/bgm_evening_night_8bit.mp3';
+    }
+    // 朝〜昼は調査曲
+    return 'audio/bgm_investigation_day_8bit.mp3';
+  }
+
   void _playGameBgm() {
-    // ゲーム中もBGMを流す（現状はタイトルと同じファイルを再利用）
-    _audioService.playBgm('audio/title_theme.mp3');
+    // 同じ曲が再生中の場合はJS側で無視されるため、状態変化のたびに呼んで良い
+    _audioService.playBgm(bgmForCurrentState());
   }
 
   Future<void> _autoSave() async {
@@ -339,6 +353,7 @@ Day ${gameState.currentDay} ${gameState.currentTime}
                   setState(() {
                     currentText = scenarioText;
                   });
+                  _playGameBgm(); // 時間帯に応じてBGMを切り替え
                   _autoSave();
                 },
                 child: const Text('了解'),
@@ -603,6 +618,7 @@ Day ${gameState.currentDay} ${gameState.currentTime}
       _checkTimeAdvance();
     });
 
+    _playGameBgm(); // 警戒度・発見フラグに応じてBGMを切り替え
     _autoSave();
 
     // ゲームオーバーチェック
@@ -781,7 +797,11 @@ Day ${gameState.currentDay} ${gameState.currentTime}
     }
     gameState.setFlag('ending_reached', true);
 
-    _audioService.stopBgm();
+    if (type == 'true') {
+      _audioService.playBgm('audio/bgm_true_ending_8bit.mp3');
+    } else {
+      _audioService.stopBgm();
+    }
     _autoSave();
 
     showDialog(

@@ -50,7 +50,7 @@ class _TitleScreenState extends State<TitleScreen> with SingleTickerProviderStat
       setState(() => _isBgmPlaying = false);
     } else {
       // playBgm を先に呼んでから setState（ユーザーインタラクション内で呼ぶことが重要）
-      await _audioService.playBgm('audio/title_theme.mp3');
+      await _audioService.playBgm('audio/bgm_title_theme_8bit.mp3');
       setState(() => _isBgmPlaying = true);
     }
   }
