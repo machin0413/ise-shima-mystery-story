@@ -82,6 +82,7 @@ Day ${gameState.currentDay} ${gameState.currentTime}
         'assets/images/bg_harbor.jpg',
         'assets/images/bg_police_station.jpg',
         'assets/images/bg_pearl_farm.jpg',
+        'assets/images/ending_true.jpg',
       ];
       for (final path in imagePaths) {
         precacheImage(AssetImage(path), context);

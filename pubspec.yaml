@@ -78,6 +78,7 @@ flutter:
     - assets/images/bg_harbor.jpg
     - assets/images/bg_police_station.jpg
     - assets/images/bg_pearl_farm.jpg
+    - assets/images/ending_true.jpg
     # Title screen background
     - assets/images/title_bg.jpg
     # Audio files
