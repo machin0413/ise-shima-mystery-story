@@ -129,6 +129,9 @@ class _TextDisplayState extends State<TextDisplay> {
                       widget.backgroundImage!,
                       fit: BoxFit.cover,
                       cacheWidth: 800,
+                      // 画像が存在しない場合は背景なしで表示を続行
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox.shrink(),
                     ),
                   ),
                 ),

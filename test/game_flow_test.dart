@@ -71,8 +71,10 @@ void main() {
 
     await tester.tap(find.text('西山社長（真珠養殖場）'));
     await tester.pumpAndSettle();
+    // エンディング画面のタイプライター表示完了を待つ
+    await tester.pump(const Duration(seconds: 30));
 
-    expect(find.text('NORMAL ENDING'), findsOneWidget);
+    expect(find.textContaining('NORMAL ENDING'), findsOneWidget);
     expect(find.textContaining('─Fin─'), findsOneWidget);
   });
 
@@ -84,8 +86,9 @@ void main() {
 
     await tester.tap(find.text('西山社長（真珠養殖場）'));
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 30));
 
-    expect(find.text('TRUE ENDING'), findsOneWidget);
+    expect(find.textContaining('TRUE ENDING'), findsOneWidget);
     expect(find.textContaining('西山社長は逮捕'), findsOneWidget);
   });
 
@@ -99,8 +102,9 @@ void main() {
     await tester.tap(find.text('しらべる'));
     await tester.pump(const Duration(seconds: 15));
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 30));
 
-    expect(find.text('BAD ENDING'), findsOneWidget);
+    expect(find.textContaining('BAD ENDING'), findsOneWidget);
     expect(find.textContaining('3日目の朝が来てしまった'), findsOneWidget);
   });
 

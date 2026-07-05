@@ -9,6 +9,7 @@ import '../widgets/status_bar.dart';
 import '../widgets/character_dialogue.dart';
 import '../services/audio_service.dart';
 import '../services/save_service.dart';
+import 'ending_screen.dart';
 import 'notes_screen.dart';
 import 'settings_screen.dart';
 import 'title_screen.dart';
@@ -786,17 +787,12 @@ Day ${gameState.currentDay} ${gameState.currentTime}
 
   void _showEnding(String type) {
     String endingText;
-    String endingTitle;
-
     if (type == 'true') {
       endingText = ScenarioData.endingTrue;
-      endingTitle = 'TRUE ENDING';
     } else if (type == 'timeout') {
       endingText = ScenarioData.endingTimeout;
-      endingTitle = 'BAD ENDING';
     } else {
       endingText = ScenarioData.endingGoodbye;
-      endingTitle = 'NORMAL ENDING';
     }
     gameState.setFlag('ending_reached', true);
 
@@ -807,56 +803,9 @@ Day ${gameState.currentDay} ${gameState.currentTime}
     }
     _autoSave();
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF000800),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-          side: BorderSide(
-            color: type == 'true'
-                ? const Color(0xFF00FFFF)
-                : type == 'timeout'
-                    ? const Color(0xFFFF6600)
-                    : const Color(0xFF00FF00),
-            width: 3,
-          ),
-        ),
-        title: Text(
-          endingTitle,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontSize: 20,
-            color: type == 'true'
-                ? const Color(0xFF00FFFF)
-                : type == 'timeout'
-                    ? const Color(0xFFFF6600)
-                    : const Color(0xFF00FF00),
-            letterSpacing: 4,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        content: SingleChildScrollView(
-          child: Text(
-            endingText,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontSize: 14,
-              height: 1.8,
-              color: const Color(0xFF00FF00),
-            ),
-          ),
-        ),
-        actions: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _returnToTitle();
-              },
-              child: const Text('タイトルに戻る'),
-            ),
-          ),
-        ],
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => EndingScreen(type: type, endingText: endingText),
       ),
     );
   }

@@ -878,10 +878,6 @@ class ScenarioData {
 
   /// エンディングテキスト
   static const String endingTrue = '''
-━━━━━━━━━━━━━━━━━━━━━
-　　　　　TRUE ENDING
-━━━━━━━━━━━━━━━━━━━━━
-
 橘刑事に全ての証拠を提出した。
 
 翌朝、警察が真珠養殖場に
@@ -917,10 +913,6 @@ class ScenarioData {
 ''';
 
   static const String endingGoodbye = '''
-━━━━━━━━━━━━━━━━━━━━━
-　　　　　NORMAL ENDING
-━━━━━━━━━━━━━━━━━━━━━
-
 証拠を橘刑事に渡した。
 
 しかし、証拠が不完全だったため、
@@ -943,10 +935,6 @@ class ScenarioData {
 ''';
 
   static const String endingTimeout = '''
-━━━━━━━━━━━━━━━━━━━━━
-　　　　　BAD ENDING
-━━━━━━━━━━━━━━━━━━━━━
-
 3日目の朝が来てしまった。
 
 橘刑事に呼び出された私は、
