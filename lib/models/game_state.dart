@@ -9,8 +9,8 @@ class GameState {
   // 収集した手がかり
   Set<String> clues = {};
   
-  // 会話したNPC
-  Set<String> talkedTo = {};
+  // 会話したNPC（会話回数を数えるため重複を許可するList）
+  List<String> talkedTo = [];
   
   // 訪れた場所
   Set<String> visitedLocations = {};
@@ -181,7 +181,7 @@ class GameState {
     state.currentLocationId = json['currentLocationId'] ?? 'minshuku';
     state.policeAlert = json['policeAlert'] ?? 0;
     state.clues = Set<String>.from(json['clues'] ?? []);
-    state.talkedTo = Set<String>.from(json['talkedTo'] ?? []);
+    state.talkedTo = List<String>.from(json['talkedTo'] ?? []);
     state.visitedLocations = Set<String>.from(json['visitedLocations'] ?? []);
     state.investigatedLocations = Set<String>.from(json['investigatedLocations'] ?? []);
     state.secretInvestigatedLocations = Set<String>.from(json['secretInvestigatedLocations'] ?? []);

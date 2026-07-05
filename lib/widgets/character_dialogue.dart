@@ -19,10 +19,10 @@ class CharacterDialogue extends StatefulWidget {
 
 class _CharacterDialogueState extends State<CharacterDialogue> {
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     if (widget.character.imagePath != null) {
-      // 画像を事前ロード（画面表示前にキャッシュに入れる）
+      // 画像を事前ロード（initStateではMediaQueryに依存できないためここで行う）
       precacheImage(AssetImage(widget.character.imagePath!), context);
     }
   }

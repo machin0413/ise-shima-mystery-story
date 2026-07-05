@@ -35,6 +35,7 @@ class _GameScreenState extends State<GameScreen> {
       gameState = widget.savedState!;
       isOpening = false;
       currentText = _getRestoredText();
+      _playGameBgm();
     } else {
       gameState = GameState();
       _startGame();
@@ -106,8 +107,8 @@ Day ${gameState.currentDay} ${gameState.currentTime}
   }
 
   void _playGameBgm() {
-    // ゲーム中はタイトルBGMと別にゲームBGMを流す（同じファイルを再利用）
-    // 将来的には時間帯別BGMに切り替え可能
+    // ゲーム中もBGMを流す（現状はタイトルと同じファイルを再利用）
+    _audioService.playBgm('audio/title_theme.mp3');
   }
 
   Future<void> _autoSave() async {
@@ -279,8 +280,14 @@ Day ${gameState.currentDay} ${gameState.currentTime}
   }
   
   void _showTimeAdvanceDialog(String oldTime, int oldDay, String newTime, int newDay) {
+    // Day 3の朝を迎えたらタイムアップ
+    if (newDay >= 3) {
+      _showEnding('timeout');
+      return;
+    }
+
     String scenarioText = '';
-    
+
     if (newDay == 1) {
       if (newTime == '昼') {
         scenarioText = ScenarioData.day1Afternoon;
@@ -298,6 +305,8 @@ Day ${gameState.currentDay} ${gameState.currentTime}
         scenarioText = ScenarioData.day2Afternoon;
       } else if (newTime == '夕') {
         scenarioText = ScenarioData.day2Evening;
+      } else if (newTime == '夜') {
+        scenarioText = ScenarioData.day2Night;
       }
     }
     
@@ -763,12 +772,14 @@ Day ${gameState.currentDay} ${gameState.currentTime}
     if (type == 'true') {
       endingText = ScenarioData.endingTrue;
       endingTitle = 'TRUE ENDING';
-      gameState.setFlag('ending_reached', true);
+    } else if (type == 'timeout') {
+      endingText = ScenarioData.endingTimeout;
+      endingTitle = 'BAD ENDING';
     } else {
       endingText = ScenarioData.endingGoodbye;
       endingTitle = 'NORMAL ENDING';
-      gameState.setFlag('ending_reached', true);
     }
+    gameState.setFlag('ending_reached', true);
 
     _audioService.stopBgm();
     _autoSave();
@@ -783,7 +794,9 @@ Day ${gameState.currentDay} ${gameState.currentTime}
           side: BorderSide(
             color: type == 'true'
                 ? const Color(0xFF00FFFF)
-                : const Color(0xFF00FF00),
+                : type == 'timeout'
+                    ? const Color(0xFFFF6600)
+                    : const Color(0xFF00FF00),
             width: 3,
           ),
         ),
@@ -793,7 +806,9 @@ Day ${gameState.currentDay} ${gameState.currentTime}
             fontSize: 20,
             color: type == 'true'
                 ? const Color(0xFF00FFFF)
-                : const Color(0xFF00FF00),
+                : type == 'timeout'
+                    ? const Color(0xFFFF6600)
+                    : const Color(0xFF00FF00),
             letterSpacing: 4,
           ),
           textAlign: TextAlign.center,
@@ -872,8 +887,9 @@ Day ${gameState.currentDay} ${gameState.currentTime}
                     gameState.currentTime = '朝';
                     gameState.currentLocation = '海女小屋';
                     gameState.currentLocationId = 'amagoya';
-                    currentText = ScenarioData.day1Morning;
+                    currentText = ScenarioData.day1MorningAmagoya;
                   });
+                  _playGameBgm();
                 },
                 child: const Text('もう一度挑戦'),
               ),

@@ -170,7 +170,7 @@ class _CluesTab extends StatelessWidget {
 
 // 人物タブ
 class _CharactersTab extends StatelessWidget {
-  final Set<String> talkedTo;
+  final List<String> talkedTo;
 
   const _CharactersTab({required this.talkedTo});
 
@@ -194,6 +194,7 @@ class _CharactersTab extends StatelessWidget {
     }
 
     final characters = talkedTo
+        .toSet()
         .map((id) => char.GameCharacters.getById(id))
         .where((c) => c != null)
         .cast<char.Character>()
