@@ -95,7 +95,7 @@ class GameCharacters {
     age: 42,
     role: '県警捜査一課',
     description: '本庁から派遣された敏腕刑事。よそ者に冷たい。',
-    imagePath: 'assets/images/policeman.jpg', // 暫定
+    imagePath: 'assets/images/detective.jpg',
   );
 
   static final Character pearlBoss = Character(

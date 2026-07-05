@@ -68,6 +68,7 @@ flutter:
     - assets/images/tome.jpg
     - assets/images/takeshi.jpg
     - assets/images/policeman.jpg
+    - assets/images/detective.jpg
     # Background images (PC-98 style)
     - assets/images/bg_minshuku.jpg
     - assets/images/bg_amagoya.jpg
@@ -77,13 +78,6 @@ flutter:
     - assets/images/bg_police_station.jpg
     # Title screen background
     - assets/images/title_bg.jpg
-    # Location backgrounds
-    - assets/images/backgrounds/minshuku.jpg
-    - assets/images/backgrounds/amagoya.jpg
-    - assets/images/backgrounds/beach.jpg
-    - assets/images/backgrounds/suzuki_house.jpg
-    - assets/images/backgrounds/harbor.jpg
-    - assets/images/backgrounds/police_station.jpg
     # Audio files
     - assets/audio/bgm_title_theme_8bit.mp3
     - assets/audio/bgm_investigation_day_8bit.mp3

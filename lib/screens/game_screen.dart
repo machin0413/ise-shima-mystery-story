@@ -72,6 +72,7 @@ Day ${gameState.currentDay} ${gameState.currentTime}
         'assets/images/tome.jpg',
         'assets/images/takeshi.jpg',
         'assets/images/policeman.jpg',
+        'assets/images/detective.jpg',
         'assets/images/bg_minshuku.jpg',
         'assets/images/bg_amagoya.jpg',
         'assets/images/bg_beach.jpg',
